@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>教师上传素材 | Teacher Upload - LinguaListen</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: #fff9f4; color: #333; margin: 0; padding: 0; text-align: center; }
+    header { background: #ff8c3a; color: white; padding: 1.5rem; font-size: 1.5rem; }
+    h1 { color: #ff8c3a; margin-top: 1.5rem; }
+    form { max-width: 600px; margin: 2rem auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    input, textarea { width: 100%; padding: 0.8rem; margin-top: 0.5rem; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
+    input[type="file"] { border: none; }
+    button { background: #ff8c3a; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; margin-top: 1rem; font-size: 1rem; }
+    button:hover { background: #e67825; }
+    #message { margin-top: 1rem; font-weight: bold; }
+    footer { margin-top: 3rem; padding: 1rem; font-size: 0.9rem; color: #555; }
+  </style>
+</head>
+<body>
+  <header>🎧 听语灵 LinguaListen</header>
+  <h1>🧑‍🏫 上传听力素材 / Upload Listening Material</h1>
+
+  <form id="uploadForm">
+    <label>🎵 素材标题 / Title:</label>
+    <input type="text" id="title" placeholder="例如：The Boy and the Old Man" required />
+
+    <label>📄 听力文本 / Script:</label>
+    <textarea id="script" rows="6" placeholder="请输入听力原文 / Enter the transcript" required></textarea>
+
+    <label>📂 上传音频文件 / Audio File (.mp3 / .wav):</label>
+    <input type="file" id="audio" accept=".mp3,.wav" required />
+
+    <button type="submit">⬆️ 上传 Upload</button>
+    <div id="message"></div>
+  </form>
+
+  <footer>© 2025 LinguaListen · Teacher Panel</footer>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const message = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      message.textContent = '⏳ 上传中 Uploading...';
+
+      const title = document.getElementById('title').value.trim();
+      const script = document.getElementById('script').value.trim();
+      const audioFile = document.getElementById('audio').files[0];
+
+      if (!title || !script || !audioFile) {
+        message.textContent = '⚠️ 请填写完整信息 / Please complete all fields.';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('text', script);
+      formData.append('audio', audioFile);
+
+      try {
+        const response = await fetch('https://lingualisten-backend.onrender.com/materials', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.ok) {
+          message.textContent = '✅ 上传成功 / Upload successful!';
+          form.reset();
+        } else {
+          const errorText = await response.text();
+          message.textContent = '❌ 上传失败 / Upload failed: ' + errorText;
+        }
+      } catch (error) {
+        message.textContent = '❌ 网络错误 / Network error.';
+      }
+    });
+  </script>
+</body>
+</html>
