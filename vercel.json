@@ -1,1 +1,7 @@
-vercel.json
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/download", "destination": "/download.html" },
+    { "source": "/privacy", "destination": "/privacy.html" }
+  ]
+}
