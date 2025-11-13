@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Student Report · LinguaListen</title>
+
+<style>
+  body { 
+    font-family: Arial;
+    padding: 25px; 
+    background: #fff7ef;
+  }
+  h1 { color: #ff7d2d; }
+  #box {
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 0 8px rgba(0,0,0,0.1);
+  }
+  .score-item{
+    padding:10px 0;
+    font-size:18px;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>📊 学习成绩报告 Student Report</h1>
+
+<p>学生：<b id="studentName"></b></p>
+
+<div id="box">
+  <p id="summary">加载中 Loading...</p>
+  <div id="details"></div>
+</div>
+
+<button onclick="window.location.href='student_dashboard.html'">
+⬅️ 返回任务列表 Back
+</button>
+
+<script>
+const API = "https://lingualisten-backend.onrender.com";
+let student = localStorage.getItem("student");
+
+if (!student) window.location.href = "login.html";
+
+document.getElementById("studentName").textContent = student;
+
+// 加载报告
+async function loadReport(){
+  const res = await fetch(`${API}/reports/user/${student}`);
+  const data = await res.json();
+
+  document.getElementById("summary").innerHTML =
+    `📌 总提交次数 Total submissions: <b>${data.count}</b>`;
+
+  let html = "";
+
+  for (let type in data.average_by_type){
+    html += `
+      <div class="score-item">
+        ⭐ <b>${type}</b> 平均分 Avg: 
+        <b>${data.average_by_type[type]}</b>
+      </div>
+    `;
+  }
+
+  if (html === "") html = "<p>暂无成绩 No data yet.</p>";
+
+  document.getElementById("details").innerHTML = html;
+}
+
+loadReport();
+</script>
+
+</body>
+</html>
