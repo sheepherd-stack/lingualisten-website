@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>学生管理 · Student Admin</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input, button { padding: 8px; margin: 5px 0; width: 250px; }
+    .box { border: 1px solid #ddd; padding: 15px; width: 300px; display: inline-block; vertical-align: top; margin-right: 20px;}
+    h2 { color: #ff7d2d; }
+    table { border-collapse: collapse; margin-top: 20px;}
+    td, th { border: 1px solid #ccc; padding: 6px 12px; }
+  </style>
+</head>
+<body>
+
+<h1>学生管理 Student Admin</h1>
+<h3>API： https://lingualisten-backend.onrender.com</h3>
+
+<!-- 获取学生 -->
+<div class="box">
+  <h2>📘 所有学生</h2>
+  <button onclick="loadStudents()">刷新 Refresh</button>
+  <pre id="studentList"></pre>
+</div>
+
+<!-- 添加学生 -->
+<div class="box">
+  <h2>➕ 添加学生</h2>
+  <input id="add_username" placeholder="用户名 username"><br>
+  <input id="add_password" placeholder="密码 password"><br>
+  <input id="add_email" placeholder="邮箱 email"><br>
+  <input id="add_phone" placeholder="电话 phone"><br>
+  <button onclick="addStudent()">添加 Add</button>
+  <p id="add_result"></p>
+</div>
+
+<!-- 重置密码 -->
+<div class="box">
+  <h2>🔑 重置密码</h2>
+  <input id="reset_username" placeholder="用户名 username"><br>
+  <input id="reset_password" placeholder="新密码 new password"><br>
+  <button onclick="resetPassword()">重置 Reset</button>
+  <p id="reset_result"></p>
+</div>
+
+<script>
+const API = "https://lingualisten-backend.onrender.com";
+
+async function loadStudents() {
+  const res = await fetch(API + "/students");
+  const data = await res.json();
+  document.getElementById("studentList").textContent = JSON.stringify(data, null, 2);
+}
+
+async function addStudent() {
+  const body = {
+    username: document.getElementById("add_username").value,
+    password: document.getElementById("add_password").value,
+    email: document.getElementById("add_email").value,
+    phone: document.getElementById("add_phone").value,
+  };
+
+  const res = await fetch(API + "/students/add", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(body)
+  });
+
+  const txt = await res.text();
+  document.getElementById("add_result").textContent = txt;
+}
+
+async function resetPassword() {
+  const body = {
+    username: document.getElementById("reset_username").value,
+    new_password: document.getElementById("reset_password").value,
+  };
+
+  const res = await fetch(API + "/students/reset", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(body)
+  });
+
+  const txt = await res.text();
+  document.getElementById("reset_result").textContent = txt;
+}
+</script>
+
+</body>
+</html>
