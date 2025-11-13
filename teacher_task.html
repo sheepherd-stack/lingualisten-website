@@ -1,65 +1,63 @@
+
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Teacher Material Upload</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-    }
-    .container {
-      max-width: 600px;
-      margin: auto;
-    }
-    input, textarea, button {
-      width: 100%;
-      margin-top: 10px;
-      padding: 10px;
-    }
-    button {
-      background: orange;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-size: 18px;
-    }
-    button:hover {
-      opacity: 0.8;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Teacher Panel - LinguaListen</title>
+    <link rel="stylesheet" href="teacher_task.css">
 </head>
-
 <body>
-  <div class="container">
-    <h2>🧑‍🏫 Teacher: Upload Material</h2>
 
-    <!-- Text -->
-    <label>Enter your listening text:</label>
-    <textarea id="material_text" rows="5"></textarea>
+<div class="container">
+    <h1>📚 LinguaListen — Teacher Panel</h1>
 
-    <!-- Submit -->
-    <button onclick="uploadMaterial()">Upload Material</button>
+    <!-- Upload Material -->
+    <section>
+        <h2>1️⃣ Upload Teaching Material</h2>
+        <label>Material Text:</label>
+        <textarea id="materialText" placeholder="Paste your text here..."></textarea>
 
-    <p id="result"></p>
-  </div>
+        <label>Audio File (optional):</label>
+        <input type="file" id="audioFile" accept="audio/*">
 
-  <script>
-    const API = "https://lingualisten-backend-FQNB.onrender.com";
+        <button onclick="uploadMaterial()">Upload Material</button>
 
-    async function uploadMaterial() {
-      let text = document.getElementById("material_text").value;
+        <p id="uploadResult"></p>
+    </section>
 
-      const res = await fetch(API + "/materials", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ text })
-      });
+    <!-- Auto Split -->
+    <section>
+        <h2>2️⃣ Auto Split Sentences</h2>
+        <label>Material ID:</label>
+        <input id="materialId" placeholder="Material ID from Step 1">
 
-      let data = await res.json();
-      document.getElementById("result").innerHTML =
-        "Material Created! ID: " + data.mid;
-    }
-  </script>
+        <button onclick="autoSplit()">Split Sentences</button>
+
+        <p id="splitResult"></p>
+    </section>
+
+    <!-- Create Task -->
+    <section>
+        <h2>3️⃣ Create Task</h2>
+
+        <label>Choose Task Type:</label>
+        <select id="taskType">
+            <option value="dictation">Dictation（听写）</option>
+            <option value="shadowing">Shadowing（跟读）</option>
+            <option value="retell">Retell（复述）</option>
+            <option value="summary">Summary（总结）</option>
+        </select>
+
+        <label>Use Material ID:</label>
+        <input id="taskMaterialId" placeholder="Material ID">
+
+        <button onclick="createTask()">Create Task</button>
+
+        <p id="taskResult"></p>
+    </section>
+</div>
+
+<script src="teacher_task.js"></script>
+
 </body>
 </html>
