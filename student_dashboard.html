@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>学生主页 Student Dashboard</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background:#fff7ef; }
+    h1 { color:#ff7d2d; }
+    .task { border:1px solid #ddd; padding:10px; margin:8px 0; border-radius:8px; background:white; }
+    button { padding:10px; margin-top:10px; font-size:16px; }
+  </style>
+</head>
+<body>
+
+<h1 id="welcome">LinguaListen · 学生主页</h1>
+
+<p>当前学生： <b id="studentName"></b></p>
+
+<h2>📘 我的任务 My Tasks</h2>
+<div id="taskList">加载中 Loading...</div>
+
+<button onclick="goReport()">📊 查看历史成绩 Report</button>
+
+<script>
+const API = "https://lingualisten-backend.onrender.com";
+
+// 读取登录的学生
+const student = localStorage.getItem("student");
+if (!student) {
+  alert("请先登录 Please login first");
+  window.location.href = "login.html";
+}
+document.getElementById("studentName").textContent = student;
+
+// 加载任务列表（先简化：展示所有任务）
+async function loadTasks() {
+  const res = await fetch(API + "/tasks/1");  // 暂时使用任务1作示例
+  if (!res.ok) {
+    document.getElementById("taskList").textContent = "没有找到任务 No tasks";
+    return;
+  }
+
+  const task = await res.json();
+  let html = `
+    <div class='task'>
+      <h3>${task.title}</h3>
+      <p>题型 Modes: ${task.modes.join(", ")}</p>
+      <button onclick="startTask(${task.id})">开始任务 Start</button>
+    </div>
+  `;
+
+  document.getElementById("taskList").innerHTML = html;
+}
+
+function startTask(id) {
+  localStorage.setItem("task_id", id);
+  window.location.href = "student_task.html";
+}
+
+function goReport() {
+  window.location.href = "student_report.html";
+}
+
+loadTasks();
+</script>
+
+</body>
+</html>
