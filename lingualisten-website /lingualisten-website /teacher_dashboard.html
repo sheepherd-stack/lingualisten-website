@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Teacher Dashboard · LinguaListen</title>
+
+<style>
+  body {
+    font-family: Arial;
+    background: #fff5eb;
+    padding: 25px;
+  }
+  h1 { color: #ff7e2b; }
+
+  .btn-box {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 320px;
+  }
+
+  .menu-btn {
+    padding: 15px;
+    font-size: 18px;
+    background: white;
+    border-radius: 10px;
+    border: 2px solid #ff7e2b;
+    cursor: pointer;
+  }
+
+  .menu-btn:hover {
+    background: #ffe7d2;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>🧑‍🏫 Teacher Dashboard</h1>
+
+<p>欢迎你，老师！请选择一个操作：</p>
+
+<div class="btn-box">
+
+  <button class="menu-btn"
+    onclick="window.location.href='teacher_students.html'">
+    👥 学生管理 Student Accounts
+  </button>
+
+  <button class="menu-btn"
+    onclick="window.location.href='teacher_task.html'">
+    📘 上传材料 Upload Material
+  </button>
+
+  <button class="menu-btn"
+    onclick="window.location.href='teacher_tasks.html'">
+    📚 任务管理 Tasks Management
+  </button>
+
+  <button class="menu-btn"
+    onclick="window.location.href='teacher_reports.html'">
+    📊 学生成绩报告 Students Reports
+  </button>
+
+</div>
+
+</body>
+</html>
