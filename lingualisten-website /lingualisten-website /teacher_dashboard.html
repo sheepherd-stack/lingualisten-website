@@ -1,68 +1,169 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<title>Teacher Dashboard · LinguaListen</title>
+  <meta charset="UTF-8">
+  <title>Teacher Dashboard</title>
 
-<style>
-  body {
-    font-family: Arial;
-    background: #fff5eb;
-    padding: 25px;
-  }
-  h1 { color: #ff7e2b; }
-
-  .btn-box {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    max-width: 320px;
-  }
-
-  .menu-btn {
-    padding: 15px;
-    font-size: 18px;
-    background: white;
-    border-radius: 10px;
-    border: 2px solid #ff7e2b;
-    cursor: pointer;
-  }
-
-  .menu-btn:hover {
-    background: #ffe7d2;
-  }
-</style>
+  <style>
+    body {
+      font-family: Arial;
+      background: #fffdf7;
+      padding: 20px;
+    }
+    h2 {
+      color: #ff8c3a;
+    }
+    .box {
+      background: white;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 6px 12px;
+      background: #ff8c3a;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 5px;
+    }
+    th, td {
+      border-bottom: 1px solid #ddd;
+      padding: 8px;
+    }
+  </style>
 </head>
-
 <body>
 
-<h1>🧑‍🏫 Teacher Dashboard</h1>
+<h2>🧑‍🏫 教师任务管理（Teacher Dashboard）</h2>
 
-<p>欢迎你，老师！请选择一个操作：</p>
-
-<div class="btn-box">
-
-  <button class="menu-btn"
-    onclick="window.location.href='teacher_students.html'">
-    👥 学生管理 Student Accounts
-  </button>
-
-  <button class="menu-btn"
-    onclick="window.location.href='teacher_task.html'">
-    📘 上传材料 Upload Material
-  </button>
-
-  <button class="menu-btn"
-    onclick="window.location.href='teacher_tasks.html'">
-    📚 任务管理 Tasks Management
-  </button>
-
-  <button class="menu-btn"
-    onclick="window.location.href='teacher_reports.html'">
-    📊 学生成绩报告 Students Reports
-  </button>
-
+<!-- =======================
+     SECTION A：材料列表
+======================= -->
+<div class="box">
+  <h3>📘 已上传材料（Materials）</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>标题</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody id="materialList"></tbody>
+  </table>
 </div>
+
+
+<!-- =======================
+     SECTION B：任务列表
+======================= -->
+<div class="box">
+  <h3>🎯 已创建任务（Tasks）</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>标题</th>
+        <th>材料ID</th>
+        <th>模式</th>
+        <th>难度</th>
+      </tr>
+    </thead>
+    <tbody id="taskList"></tbody>
+  </table>
+</div>
+
+
+<script>
+const API = "https://lingualisten-backend.onrender.com";
+
+/* ===============================
+   获取材料列表
+=============================== */
+async function loadMaterials() {
+  let res = await fetch(API + "/materials/all");
+  let data = await res.json();
+
+  let box = document.getElementById("materialList");
+  box.innerHTML = "";
+
+  data.forEach(m => {
+    box.innerHTML += `
+    <tr>
+      <td>${m.id}</td>
+      <td>${m.title}</td>
+      <td>
+        <button onclick="createTask(${m.id})">创建任务</button>
+      </td>
+    </tr>`;
+  });
+}
+
+
+/* ===============================
+   获取任务列表
+=============================== */
+async function loadTasks() {
+  let res = await fetch(API + "/tasks/all");
+  let data = await res.json();
+
+  let box = document.getElementById("taskList");
+  box.innerHTML = "";
+
+  data.forEach(t => {
+    box.innerHTML += `
+    <tr>
+      <td>${t.id}</td>
+      <td>${t.title}</td>
+      <td>${t.material_id}</td>
+      <td>${t.modes.join(", ")}</td>
+      <td>${t.difficulty}</td>
+    </tr>`;
+  });
+}
+
+
+/* ===============================
+   创建任务（给某个材料）
+=============================== */
+async function createTask(material_id) {
+  let title = prompt("请输入任务标题 Title:");
+  if (!title) return;
+
+  let res = await fetch(API + "/tasks", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      title: title,
+      material_id: material_id,
+      modes: ["dictation", "shadowing", "retell", "summary"],
+      difficulty: "easy"
+    })
+  });
+
+  if (res.ok) {
+    alert("任务创建成功！");
+    loadTasks(); // 刷新任务列表
+  } else {
+    alert("创建任务失败");
+  }
+}
+
+
+/* ===============================
+   初始化
+=============================== */
+loadMaterials();
+loadTasks();
+
+</script>
 
 </body>
 </html>
