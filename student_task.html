@@ -2,103 +2,232 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>LinguaListen · Task</title>
+  <title>Student Task</title>
 
   <style>
-    body { font-family: Arial; padding: 20px; background:#fff7ef; }
-    h1 { color: #ff7d2d; }
-    textarea { width: 100%; height: 120px; margin-top: 10px; }
-    button { padding: 10px; margin: 5px; font-size: 16px; }
-    #sentenceBox { padding:15px; background:white; border-radius:10px; margin:10px 0; }
+    body {
+      font-family: Arial;
+      padding: 20px;
+      background: #fffdf7;
+    }
+    h2 { color: #ff8c3a; }
+
+    #sentenceBox {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+
+    textarea, input {
+      width: 100%;
+      font-size: 16px;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-top: 8px;
+    }
+
+    button {
+      background: #ff8c3a;
+      color: white;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .result {
+      background: #e2ffe2;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 15px;
+      border: 1px solid #99d799;
+    }
   </style>
 </head>
 <body>
 
-<h1>🎧 学习任务 Student Task</h1>
-
-<p>学生：<b id="studentName"></b></p>
-
-<div id="taskInfo">加载中 Loading...</div>
+<h2>🎧 Task Practice</h2>
+<p id="taskTitle"></p>
 
 <div id="sentenceBox">
-  <h3 id="sentenceText">句子加载中...</h3>
+  <p id="sentenceText">加载中...</p>
 </div>
 
-<textarea id="answerBox" placeholder="在此输入你的内容 Type what you heard…"></textarea>
-
-<button onclick="submitDictation()">提交听写 Submit Dictation</button>
+<div id="modeBox"></div>
 
 <p id="result"></p>
 
-<button onclick="nextSentence()">➡️ 下一句 Next</button>
+<button onclick="nextSentence()">下一句 ▶</button>
 
 <script>
 const API = "https://lingualisten-backend.onrender.com";
 
-let student = localStorage.getItem("student");
-let task_id = localStorage.getItem("task_id");
-
-if(!student) window.location.href = "login.html";
-
-document.getElementById("studentName").textContent = student;
+// 从 localStorage 获取任务信息
+const username = localStorage.getItem("student_username");
+const taskId = localStorage.getItem("current_task");
 
 let task = null;
 let index = 0;
-let sentences = [];
 
-// 1) 加载任务
+// 加载任务
 async function loadTask() {
-  const res = await fetch(`${API}/tasks/${task_id}`);
-  task = await res.json();
-  sentences = task.sentences;
+  let t = await fetch(API + "/tasks/" + taskId).then(r => r.json());
+  task = t;
 
-  document.getElementById("taskInfo").innerHTML =
-    `<h2>${task.title}</h2><p>题型：${task.modes.join(", ")}</p>`;
+  document.getElementById("taskTitle").innerHTML =
+    `任务：${t.title} | 模式：${t.modes.join(", ")}`;
 
-  showSentence();
+  loadSentence();
 }
 
-function showSentence() {
-  if (index >= sentences.length) {
-    document.getElementById("sentenceText").textContent = "🎉 恭喜完成全部句子 All sentences done!";
+// 显示当前句子
+function loadSentence() {
+  if (index >= task.sentences.length) {
+    document.getElementById("sentenceText").innerHTML = "任务完成！🎉";
+    document.getElementById("modeBox").innerHTML = "";
     return;
   }
-  document.getElementById("sentenceText").textContent =
-    sentences[index].text;
 
-  document.getElementById("answerBox").value = "";
-  document.getElementById("result").textContent = "";
+  const s = task.sentences[index];
+  document.getElementById("sentenceText").innerHTML = s.text;
+
+  buildModeUI(s);
 }
 
-// 2) 提交听写
-async function submitDictation() {
-  const expected = sentences[index].text;
-  const text = document.getElementById("answerBox").value;
+// 根据任务模式生成 UI
+function buildModeUI(sentence) {
+  let html = "";
 
-  const payload = {
-    user_id: student,
-    task_id: Number(task_id),
-    sentence_id: sentences[index].id,
-    expected,
-    text
+  if (task.modes.includes("dictation")) {
+    html += `
+      <h3>✏️ 听写 Dictation</h3>
+      <textarea id="dictInput" rows="3" placeholder="输入你听到的内容"></textarea>
+      <button onclick="submitDictation(${sentence.id}, '${sentence.text}')">提交</button>
+    `;
+  }
+
+  if (task.modes.includes("retell")) {
+    html += `
+      <h3>📖 Retell 复述</h3>
+      <textarea id="retellInput" rows="3" placeholder="用你自己的话复述这句话"></textarea>
+      <button onclick="submitRetell(${sentence.id}, '${sentence.text}')">提交</button>
+    `;
+  }
+
+  if (task.modes.includes("summary")) {
+    html += `
+      <h3>📝 Summary 总结</h3>
+      <textarea id="summaryInput" rows="3" placeholder="总结这句话的含义"></textarea>
+      <button onclick="submitSummary(${sentence.id}, '${sentence.text}')">提交</button>
+    `;
+  }
+
+  if (task.modes.includes("shadowing")) {
+    html += `
+      <h3>🎤 Shadowing 跟读</h3>
+      <button onclick="submitShadowing(${sentence.id})">模拟提交（临时版）</button>
+    `;
+  }
+
+  document.getElementById("modeBox").innerHTML = html;
+}
+
+// 提交听写
+async function submitDictation(sid, expected) {
+  let txt = document.getElementById("dictInput").value.trim();
+  if (!txt) return alert("请输入内容");
+
+  let payload = {
+    user_id: username,
+    task_id: taskId,
+    sentence_id: sid,
+    expected: expected,
+    text: txt
   };
 
-  const res = await fetch(`${API}/submit/dictation`, {
+  let res = await fetch(API + "/submit/dictation", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify(payload)
   });
 
-  const data = await res.json();
-  
-  document.getElementById("result").textContent =
-    `得分 Score: ${data.score}`;
+  let out = await res.json();
+
+  document.getElementById("result").innerHTML =
+    `<div class="result">得分：${out.score}</div>`;
 }
 
-// 3) 下一句
+// 提交复述
+async function submitRetell(sid, reference) {
+  let txt = document.getElementById("retellInput").value.trim();
+  if (!txt) return alert("请输入内容");
+
+  let res = await fetch(API + "/submit/retell", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      user_id: username,
+      task_id: taskId,
+      sentence_id: sid,
+      reference: reference,
+      text: txt
+    })
+  });
+
+  let out = await res.json();
+  document.getElementById("result").innerHTML =
+    `<div class="result">得分：${out.score}</div>`;
+}
+
+// 提交总结
+async function submitSummary(sid, reference) {
+  let txt = document.getElementById("summaryInput").value.trim();
+  if (!txt) return alert("请输入内容");
+
+  let res = await fetch(API + "/submit/summary", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      user_id: username,
+      task_id: taskId,
+      reference: reference,
+      text: txt
+    })
+  });
+
+  let out = await res.json();
+  document.getElementById("result").innerHTML =
+    `<div class="result">得分：${out.score}</div>`;
+}
+
+// 跟读（临时版）
+async function submitShadowing(sid) {
+  alert("未来可上传语音，现在是模拟打分");
+  let res = await fetch(API + "/submit/shadowing", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      user_id: username,
+      task_id: taskId,
+      sentence_id: sid,
+      duration_ms: 1100,
+      reference_ms: 1000
+    })
+  });
+
+  let out = await res.json();
+  document.getElementById("result").innerHTML =
+    `<div class="result">得分：${out.score}</div>`;
+}
+
+// 下一句
 function nextSentence() {
   index++;
-  showSentence();
+  loadSentence();
 }
 
 loadTask();
