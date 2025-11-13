@@ -2,4 +2,64 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <title>LinguaListen · 教师任务创建</title>
+  <title>Teacher Material Upload</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+    }
+    input, textarea, button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+    }
+    button {
+      background: orange;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>🧑‍🏫 Teacher: Upload Material</h2>
+
+    <!-- Text -->
+    <label>Enter your listening text:</label>
+    <textarea id="material_text" rows="5"></textarea>
+
+    <!-- Submit -->
+    <button onclick="uploadMaterial()">Upload Material</button>
+
+    <p id="result"></p>
+  </div>
+
+  <script>
+    const API = "https://lingualisten-backend-FQNB.onrender.com";
+
+    async function uploadMaterial() {
+      let text = document.getElementById("material_text").value;
+
+      const res = await fetch(API + "/materials", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ text })
+      });
+
+      let data = await res.json();
+      document.getElementById("result").innerHTML =
+        "Material Created! ID: " + data.mid;
+    }
+  </script>
+</body>
+</html>
