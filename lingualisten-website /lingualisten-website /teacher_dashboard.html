@@ -167,3 +167,47 @@ loadTasks();
 
 </body>
 </html>
+
+
+<!-- =====================================
+     SECTION C：学生账号管理
+====================================== -->
+<div class="box">
+  <h3>👥 学生列表（Students）</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>用户名</th>
+        <th>邮箱</th>
+        <th>电话</th>
+      </tr>
+    </thead>
+    <tbody id="studentList"></tbody>
+  </table>
+</div>
+
+<script>
+/* ===============================
+   加载学生列表
+=============================== */
+async function loadStudents() {
+  let res = await fetch(API + "/students");
+  let data = await res.json();
+
+  let box = document.getElementById("studentList");
+  box.innerHTML = "";
+
+  Object.keys(data).forEach(username => {
+    let s = data[username];
+    box.innerHTML += `
+    <tr>
+      <td>${username}</td>
+      <td>${s.email || "-"}</td>
+      <td>${s.phone || "-"}</td>
+    </tr>`;
+  });
+}
+
+/* 🟧 在最后执行 loadStudents() */
+loadStudents();
+</script>
