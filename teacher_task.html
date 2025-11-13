@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Teacher Panel - LinguaListen</title>
-    <link rel="stylesheet" href="teacher_task.css">
+    <link rel="stylesheet" href="teacher_task.css" />
 </head>
 <body>
-
 <div class="container">
     <h1>📚 LinguaListen — Teacher Panel</h1>
 
@@ -14,11 +13,14 @@
     <section>
         <h2>1️⃣ Upload Teaching Material</h2>
 
+        <label>Material Title:</label>
+        <input id="materialTitle" placeholder="e.g. Lesson 1 - Running Boy" />
+
         <label>Material Text:</label>
         <textarea id="materialText" placeholder="Paste your text here..."></textarea>
 
         <label>Audio File (optional):</label>
-        <input type="file" id="audioFile" accept="audio/*">
+        <input type="file" id="audioFile" accept="audio/*" />
 
         <button onclick="uploadMaterial()">Upload Material</button>
 
@@ -30,7 +32,7 @@
         <h2>2️⃣ Auto Split Sentences</h2>
 
         <label>Material ID:</label>
-        <input id="materialId" placeholder="Material ID from Step 1">
+        <input id="materialId" placeholder="Material ID from Step 1" />
 
         <button onclick="autoSplit()">Split Sentences</button>
 
@@ -50,18 +52,17 @@
         </select>
 
         <label>Use Material ID:</label>
-        <input id="taskMaterialId" placeholder="Material ID">
+        <input id="taskMaterialId" placeholder="Material ID" />
 
         <button onclick="createTask()">Create Task</button>
 
         <p id="taskResult"></p>
     </section>
-
 </div>
 
-<!-- 🔥 正确引用外部 JS 文件（千万不要删） -->
+<!-- Load JS -->
 <script src="teacher_task.js"></script>
-
 </body>
 </html>
+
 
