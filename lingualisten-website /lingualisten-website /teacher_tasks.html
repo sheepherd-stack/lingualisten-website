@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Teacher Tasks · LinguaListen</title>
+<style>
+  body { font-family: Arial; padding:20px; background:#fff5eb; }
+  h2 { color:#ff7e2b; }
+
+  .box {
+    background:white; padding:15px;
+    border-radius:12px;
+    border:2px solid #ff7e2b;
+    max-width:500px; margin-bottom:25px;
+  }
+
+  input, select {
+    width:90%; padding:10px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    margin-top:5px;
+  }
+
+  button {
+    padding:12px; background:#ff7e2b; color:white;
+    font-size:16px; border:none; border-radius:8px;
+    margin-top:10px; cursor:pointer;
+  }
+  button:hover { background:#ff9c57; }
+
+  .task-item { border-bottom:1px solid #ddd; padding:10px 0; }
+</style>
+</head>
+<body>
+
+<h2>📘 Teacher Tasks 管理任务</h2>
+
+<!-- Create Task -->
+<div class="box">
+  <h3>➕ Create Task 创建任务</h3>
+
+  <label>Title 标题：</label>
+  <input id="task_title">
+
+  <label>Material ID（材料编号）：</label>
+  <input id="material_id" placeholder="例如：1">
+
+  <label>Modes 模式：</label>
+  <select id="task_modes" multiple size="4">
+    <option value="dictation">Dictation 听写</option>
+    <option value="shadowing">Shadowing 跟读</option>
+    <option value="retell">Retell 复述</option>
+    <option value="summary">Summary 摘要</option>
+  </select>
+
+  <label>Difficulty 难度：</label>
+  <select id="task_difficulty">
+    <option value="easy">Easy 简单</option>
+    <option value="medium">Medium 中等</option>
+    <option value="hard">Hard 困难</option>
+  </select>
+
+  <button onclick="createTask()">Create 提交</button>
+  <p id="create_result"></p>
+</div>
+
+<!-- Task List -->
+<div class="box">
+  <h3>📄 All Tasks 全部任务</h3>
+  <div id="task_list">Loading...</div>
+</div>
+
+<script>
+const API = "https://lingualisten-backend.onrender.com";
+
+// Load all tasks
+async function loadTasks() {
+  const res = await fetch(API + "/tasks_list");
+  const tasks = await res.json();
+
+  const box = document.getElementById("task_list");
+  box.innerHTML = "";
+
+  tasks.forEach(t => {
+    const item = document.createElement("div");
+    item.className = "task-item";
+
+    item.innerHTML = `
+      <b>${t.title}</b> (ID: ${t.id})<br>
+      Material: ${t.material_id}<br>
+      Modes: ${t.modes.join(", ")}<br>
+      Difficulty: ${t.difficulty}<br>
+    `;
+
+    box.appendChild(item);
+  });
+}
+
+// Create Task
+async function createTask() {
+  const title = document.getElementById("task_title").value;
+  const material_id = Number(document.getElementById("material_id").value);
+
+  const selected = Array.from(document.getElementById("task_modes").selectedOptions)
+                        .map(o => o.value);
+
+  const difficulty = document.getElementById("task_difficulty").value;
+
+  const payload = {
+    title,
+    material_id,
+    modes: selected,
+    difficulty
+  };
+
+  const res = await fetch(API + "/tasks", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  const text = await res.text();
+  document.getElementById("create_result").innerHTML = text;
+
+  loadTasks();
+}
+
+// 初始加载任务列表
+loadTasks();
+</script>
+
+</body>
+</html>
