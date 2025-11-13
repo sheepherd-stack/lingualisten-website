@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Teacher Admin</title>
+<style>
+  body { font-family: Arial; padding: 20px; max-width: 600px; margin:auto; }
+  input, button { padding: 8px; margin: 5px 0; width: 100%; }
+  .box { border:1px solid #ddd; padding:15px; margin-top:20px; border-radius:6px; }
+</style>
+</head>
+<body>
+
+<h2>👩‍🏫 学生账号管理后台</h2>
+
+<div class="box">
+  <h3>1) 查看所有学生</h3>
+  <button onclick="loadStudents()">📋 Load Students</button>
+  <pre id="studentList"></pre>
+</div>
+
+<div class="box">
+  <h3>2) 添加学生</h3>
+  <input id="newUser" placeholder="用户名">
+  <input id="newPass" placeholder="密码">
+  <input id="newEmail" placeholder="邮箱（可选）">
+  <input id="newPhone" placeholder="电话（可选）">
+  <button onclick="addStudent()">➕ 添加学生</button>
+  <p id="addMsg"></p>
+</div>
+
+<div class="box">
+  <h3>3) 重置学生密码</h3>
+  <input id="resetUser" placeholder="用户名">
+  <input id="resetPass" placeholder="新密码">
+  <button onclick="resetPassword()">🔑 重置密码</button>
+  <p id="resetMsg"></p>
+</div>
+
+<script>
+const API = "https://lingualisten-backend.onrender.com";
+
+async function loadStudents() {
+  const r = await fetch(API + "/students");
+  const j = await r.json();
+  document.getElementById("studentList").textContent = JSON.stringify(j, null, 2);
+}
+
+async function addStudent() {
+  const body = {
+    username: document.getElementById("newUser").value,
+    password: document.getElementById("newPass").value,
+    email: document.getElementById("newEmail").value,
+    phone: document.getElementById("newPhone").value
+  };
+
+  const r = await fetch(API + "/students/add", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(body)
+  });
+  document.getElementById("addMsg").textContent = await r.text();
+}
+
+async function resetPassword() {
+  const body = {
+    username: document.getElementById("resetUser").value,
+    new_password: document.getElementById("resetPass").value
+  };
+
+  const r = await fetch(API + "/students/reset", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(body)
+  });
+  document.getElementById("resetMsg").textContent = await r.text();
+}
+</script>
+
+</body>
+</html>
