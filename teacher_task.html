@@ -1,68 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8" />
-    <title>Teacher Panel - LinguaListen</title>
-    <link rel="stylesheet" href="teacher_task.css" />
+  <meta charset="UTF-8">
+  <title>Teacher Upload</title>
+  <link rel="stylesheet" href="teacher_task.css">
 </head>
 <body>
-<div class="container">
-    <h1>📚 LinguaListen — Teacher Panel</h1>
 
-    <!-- Upload Material -->
-    <section>
-        <h2>1️⃣ Upload Teaching Material</h2>
+<h2>📘 上传教学材料（Teacher Upload）</h2>
 
-        <label>Material Title:</label>
-        <input id="materialTitle" placeholder="e.g. Lesson 1 - Running Boy" />
+<form id="uploadForm">
+  <label>Title 标题：</label><br>
+  <input type="text" id="title" required><br><br>
 
-        <label>Material Text:</label>
-        <textarea id="materialText" placeholder="Paste your text here..."></textarea>
+  <label>Transcript（文本脚本）：</label><br>
+  <textarea id="transcript" rows="5" required></textarea><br><br>
 
-        <label>Audio File (optional):</label>
-        <input type="file" id="audioFile" accept="audio/*" />
+  <label>Audio（音频文件）：</label><br>
+  <!-- ⭐ ⭐ ⭐ 必须叫 audio！！！ -->
+  <input type="file" id="audio" name="audio" accept="audio/*"><br><br>
 
-        <button onclick="uploadMaterial()">Upload Material</button>
+  <button type="submit">上传 Upload</button>
+</form>
 
-        <p id="uploadResult"></p>
-    </section>
+<p id="result"></p>
 
-    <!-- Auto Split -->
-    <section>
-        <h2>2️⃣ Auto Split Sentences</h2>
-
-        <label>Material ID:</label>
-        <input id="materialId" placeholder="Material ID from Step 1" />
-
-        <button onclick="autoSplit()">Split Sentences</button>
-
-        <p id="splitResult"></p>
-    </section>
-
-    <!-- Create Task -->
-    <section>
-        <h2>3️⃣ Create Task</h2>
-
-        <label>Choose Task Type:</label>
-        <select id="taskType">
-            <option value="dictation">Dictation（听写）</option>
-            <option value="shadowing">Shadowing（跟读）</option>
-            <option value="retell">Retell（复述）</option>
-            <option value="summary">Summary（总结）</option>
-        </select>
-
-        <label>Use Material ID:</label>
-        <input id="taskMaterialId" placeholder="Material ID" />
-
-        <button onclick="createTask()">Create Task</button>
-
-        <p id="taskResult"></p>
-    </section>
-</div>
-
-<!-- Load JS -->
 <script src="teacher_task.js"></script>
+
 </body>
 </html>
-
-
