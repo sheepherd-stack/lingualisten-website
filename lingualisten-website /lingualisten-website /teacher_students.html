@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Student Management · LinguaListen</title>
+
+<style>
+  body { font-family: Arial; background: #fff5eb; padding: 20px; }
+  h2 { color: #ff7e2b; }
+  
+  .box {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    border: 2px solid #ff7e2b;
+    max-width: 480px;
+    margin-bottom: 25px;
+  }
+
+  input {
+    padding: 10px;
+    width: 90%;
+    margin: 5px 0;
+    border-radius: 7px;
+    border: 1px solid #ccc;
+  }
+
+  button {
+    margin-top: 10px;
+    padding: 12px;
+    background: #ff7e2b;
+    border: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  button:hover { background: #ff9c57; }
+
+  .student-item {
+    border-bottom: 1px solid #ddd;
+    padding: 8px 0;
+  }
+</style>
+
+</head>
+<body>
+
+<h2>👥 Student Accounts Management</h2>
+
+<!-- 添加学生 -->
+<div class="box">
+  <h3>➕ Add Student</h3>
+
+  <input id="new_user" placeholder="Username 用户名">
+  <input id="new_pass" placeholder="Password 密码">
+  <input id="new_email" placeholder="Email 邮箱（可选）">
+  <input id="new_phone" placeholder="Phone 电话（可选）">
+
+  <button onclick="addStudent()">Add 添加</button>
+
+  <p id="add_result"></p>
+</div>
+
+<!-- 学生列表 -->
+<div class="box">
+  <h3>📋 Student List 学生列表</h3>
+  <div id="student_list">Loading...</div>
+</div>
+
+<script>
+const API = "https://lingualisten-backend.onrender.com";
+
+// 加载学生列表
+async function loadStudents() {
+  const res = await fetch(API + "/students");
+  const data = await res.json();
+
+  const box = document.getElementById("student_list");
+  box.innerHTML = "";
+
+  Object.keys(data).forEach(name => {
+    const item = document.createElement("div");
+    item.className = "student-item";
+
+    item.innerHTML = `
+      <b>${name}</b><br>
+      📧 ${data[name].email || "—"}<br>
+      📱 ${data[name].phone || "—"}<br>
+      <button onclick="resetPass('${name}')">🔑 Reset Password</button>
+      <button onclick="deleteStudent('${name}')">🗑 Delete</button>
+    `;
+    box.appendChild(item);
+  });
+}
+
+// 添加学生
+async function addStudent() {
+  const u = document.getElementById("new_user").value.trim();
+  const p = document.getElementById("new_pass").value.trim();
+  const email = document.getElementById("new_email").value.trim();
+  const phone = document.getElementById("new_phone").value.trim();
+
+  if (!u || !p) {
+    document.getElementById("add_result").innerHTML = "❌ 用户名和密码必填";
+    return;
+  }
+
+  const res = await fetch(API + "/students/add", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username: u, password: p, email, phone })
+  });
+
+  const text = await res.text();
+  document.getElementById("add_result").innerHTML = text;
+
+  loadStudents();
+}
+
+// 重置密码
+async function resetPass(username) {
+  const newPass = prompt("请输入新密码 / Enter new password:");
+
+  if (!newPass) return;
+
+  const res = await fetch(API + "/students/reset", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, new_password: newPass })
+  });
+
+  alert(await res.text());
+}
+
+// 删除学生
+async function deleteStudent(username) {
+  if (!confirm("确定删除这个学生吗？")) return;
+
+  const res = await fetch(API + "/students/delete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username })
+  });
+
+  alert(await res.text());
+  loadStudents();
+}
+
+// 初始化加载
+loadStudents();
+
+</script>
+
+</body>
+</html>
