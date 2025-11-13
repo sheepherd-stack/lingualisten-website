@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Report</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+      background: #fffdf7;
+    }
+    h2 {
+      color: #ff8c3a;
+    }
+    #summaryBox {
+      background: white;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>📊 学习成绩报告（Student Report）</h2>
+
+<div id="summaryBox">
+  <p><b>学生：</b> <span id="studentName"></span></p>
+  <p><b>提交次数：</b> <span id="submitCount"></span></p>
+</div>
+
+<h3>📈 平均得分图表</h3>
+<canvas id="scoreChart" width="400" height="250"></canvas>
+
+<script>
+const API = "https://lingualisten-backend.onrender.com";
+
+// 获取登录学生
+const username = localStorage.getItem("student_username");
+document.getElementById("studentName").innerHTML = username;
+
+// 拉取成绩数据
+async function loadReport() {
+  let res = await fetch(API + "/reports/user/" + username);
+  let data = await res.json();
+
+  document.getElementById("submitCount").innerHTML = data.count;
+
+  let labels = Object.keys(data.average_by_type);
+  let scores = Object.values(data.average_by_type);
+
+  // 画图
+  new Chart(document.getElementById("scoreChart"), {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "平均得分",
+        data: scores,
+        backgroundColor: "#ff8c3a"
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true, max: 100 }
+      }
+    }
+  });
+}
+
+loadReport();
+</script>
+
+</body>
+</html>
