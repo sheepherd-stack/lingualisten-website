@@ -2,25 +2,39 @@ const API_BASE = "https://lingualisten-backend.onrender.com";
 
 // 1. Upload Material
 async function uploadMaterial() {
+    const title = document.getElementById("materialTitle").value;
     const text = document.getElementById("materialText").value;
-    if (!text) return alert("Please enter text");
+
+    if (!title || !text) {
+        alert("Please enter both title and text.");
+        return;
+    }
 
     const formData = new FormData();
+    formData.append("title", title);
     formData.append("text", text);
 
     const audioFile = document.getElementById("audioFile").files[0];
-    if (audioFile) formData.append("audio", audioFile);
+    if (audioFile) {
+        formData.append("audio", audioFile);
+    }
 
-    const res = await fetch(API_BASE + "/materials", {
-        method: "POST",
-        body: formData
-    });
+    try {
+        const response = await fetch(API_BASE + "/materials", {
+            method: "POST",
+            body: formData
+        });
 
-    const data = await res.json();
-    document.getElementById("uploadResult").innerHTML =
-        "Uploaded! Material ID: <b>" + data.material_id + "</b>";
+        const data = await response.json();
+
+        document.getElementById("uploadResult").innerHTML =
+            "Uploaded! Material ID: <b>" + data.material_id + "</b>";
+
+    } catch (error) {
+        document.getElementById("uploadResult").innerHTML =
+            "❌ Upload failed (network or API error)";
+    }
 }
-
 
 // 2. Auto Split
 async function autoSplit() {
@@ -36,7 +50,6 @@ async function autoSplit() {
         "Split success: " + JSON.stringify(data);
 }
 
-
 // 3. Create Task
 async function createTask() {
     const type = document.getElementById("taskType").value;
@@ -47,7 +60,7 @@ async function createTask() {
     const body = {
         task_type: type,
         material_id: mid,
-        user_id: 1  // 未来会改成老师登录ID
+        user_id: 1  // 暂时写1，未来登录系统会自动填
     };
 
     const res = await fetch(API_BASE + "/tasks", {
