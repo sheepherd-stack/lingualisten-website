@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>Task Management</title>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+      background: #fff8f0;
+    }
+    h2 { color: #ff8c3a; }
+    .task-box {
+      background: white;
+      padding: 15px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    button {
+      background: #ff8c3a;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 6px;
+    }
+    button:hover {
+      background: #e6782f;
+    }
+  </style>
+</head>
+<body>
+
+<h2>🗂 Task Management — 老师任务管理</h2>
+<p>你可以给学生布置任务：</p>
+
+<div id="taskList">加载中...</div>
+
+<script>
+const API = "https://lingualisten-backend.onrender.com";
+
+// 载入任务列表
+async function loadTasks() {
+  const res = await fetch(API + "/tasks/1");  // 你目前只有一个任务，所以暂时固定 1
+  const task = await res.json();
+
+  const div = document.getElementById("taskList");
+  div.innerHTML = `
+    <div class="task-box">
+      <h3>任务：${task.title}</h3>
+      <p>模式：${task.modes.join(", ")}</p>
+      <button onclick="assignTask(${task.id})">📤 布置任务给学生</button>
+    </div>
+  `;
+}
+
+// 布置任务给某个学生
+async function assignTask(taskId) {
+  let username = prompt("请输入学生用户名：");
+  if (!username) return;
+
+  const data = {
+    username: username,
+    task_id: taskId
+  };
+
+  let res = await fetch(API + "/assign", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(data)
+  });
+
+  if (res.ok) {
+    alert("任务已成功分配给：" + username);
+  } else {
+    alert("分配失败，请检查学生用户名是否存在");
+  }
+}
+
+loadTasks();
+</script>
+
+</body>
+</html>
