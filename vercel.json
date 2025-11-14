@@ -1,15 +1,16 @@
 {
   "rewrites": [
-    { "source": "/admin/students", "destination": "/students.html" },
-    { "source": "/admin/tasks", "destination": "/teacher_dashboard.html" },
-
+    { "source": "/student", "destination": "/student_dashboard.html" },
     { "source": "/student/dashboard", "destination": "/student_dashboard.html" },
     { "source": "/student/task", "destination": "/student_task.html" },
     { "source": "/student/report", "destination": "/student_report.html" },
 
     { "source": "/teacher", "destination": "/teacher_dashboard.html" },
-    { "source": "/teacher/upload", "destination": "/teacher_task.html" },
+    { "source": "/teacher/upload", "destination": "/teacher_upload.html" },
 
-    { "source": "/", "destination": "/index.html" }
+    { "source": "/admin/students", "destination": "/admin_students.html" },
+    { "source": "/admin/tasks", "destination": "/admin_tasks.html" },
+
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
