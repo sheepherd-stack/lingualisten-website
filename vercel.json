@@ -1,7 +1,15 @@
 {
-  "cleanUrls": true,
   "rewrites": [
-    { "source": "/download", "destination": "/download.html" },
-    { "source": "/privacy", "destination": "/privacy.html" }
+    { "source": "/admin/students", "destination": "/students.html" },
+    { "source": "/admin/tasks", "destination": "/teacher_dashboard.html" },
+
+    { "source": "/student/dashboard", "destination": "/student_dashboard.html" },
+    { "source": "/student/task", "destination": "/student_task.html" },
+    { "source": "/student/report", "destination": "/student_report.html" },
+
+    { "source": "/teacher", "destination": "/teacher_dashboard.html" },
+    { "source": "/teacher/upload", "destination": "/teacher_task.html" },
+
+    { "source": "/", "destination": "/index.html" }
   ]
 }
